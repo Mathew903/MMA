@@ -1,23 +1,29 @@
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useThemeContext } from "../contexts/Usuario"
 
 const Registrarse = () => {
-  const [regist, setRegist] = useState({name: "", password: "", rol: 1})
+  const [regist, setRegist] = useState({name: "", password: "", rol: 2})
   const {setUsuario} = useThemeContext()
   const navigate = useNavigate()
   
-  const onRegist = (e) => {
+  const onRegist = async (e) => {
     e.preventDefault()
     try {
-      fetch("http://127.0.0.1:8000/registrar", { method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(regist)})
-        .then(res => res.json())
-        .then(data => {
-          localStorage.setItem("usuario", JSON.stringify(data))
-          setUsuario(data)
-          navigate("/")
-        })
-      
+      if (regist.name && regist.name.split("@")[1] === "admin.admin" ) {
+        setRegist({ ...regist, rol: 2 });
+      }
+      if (regist.name && regist.password) {
+        console.log(regist)
+        fetch("http://127.0.0.1:8000/registrar", { method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(regist)})
+          .then(res => res.json())
+          .then(data => {
+            localStorage.setItem("usuario", JSON.stringify(data))
+            setUsuario(data)
+            navigate("/")
+          })
+      }
+      else console.log("FALTA COMPLETAR DATOS")
     } catch (error) {
       console.log(error.message)
     }
